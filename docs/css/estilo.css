@@ -1,0 +1,250 @@
+:root {
+  --tinta: #3B2A20;
+  --crema: #FFF7E3;
+  --blanco: #FFFFFF;
+  --cielo: #BFE6F2;
+  --amarillo: #FFC53D;
+  --verde: #5DB075;
+  --verde-oscuro: #3E9B5F;
+  --verde-claro: #BDE8C4;
+  --coral: #D9502F;
+  --coral-claro: #F7C3B5;
+  --pista: #FFF1C2;
+  --pista-barra: #F1E4C6;
+  --titulo: "Baloo 2", "Nunito", ui-rounded, "Segoe UI", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--crema);
+  color: var(--tinta);
+  font-family: "Nunito", ui-rounded, "Segoe UI", system-ui, sans-serif;
+  font-weight: 700;
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#app { max-width: 430px; margin: 0 auto; min-height: 100dvh; }
+
+button, input { font: inherit; color: inherit; }
+a { color: inherit; text-decoration: none; }
+h1, h2, p { margin: 0; }
+
+.pantalla {
+  min-height: 100dvh;
+  padding: calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.pantalla.cielo { background: var(--cielo); }
+
+/* Piezas comunes */
+.cab { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cab h1 { font-family: var(--titulo); font-weight: 800; font-size: 24px; line-height: 28px; }
+.cab .nombre { font-size: 30px; line-height: 30px; }
+.sub { font-size: 13px; }
+.fila { display: flex; gap: 8px; align-items: center; }
+.fila-entre { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+
+.pastilla {
+  display: flex; align-items: center; gap: 6px;
+  height: 40px; padding: 0 12px;
+  border: 3px solid var(--tinta); border-radius: 20px;
+  background: var(--blanco);
+  font-family: var(--titulo); font-weight: 800; font-size: 18px;
+  white-space: nowrap;
+}
+.circulo {
+  display: flex; align-items: center; justify-content: center;
+  width: 46px; height: 46px; flex-shrink: 0;
+  border: 3px solid var(--tinta); border-radius: 23px;
+  background: var(--blanco); cursor: pointer; padding: 0;
+}
+.tarjeta {
+  padding: 12px 14px;
+  border: 3px solid var(--tinta); border-radius: 20px;
+  background: var(--blanco);
+}
+.boton {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 58px; padding: 0 18px;
+  border: 3px solid var(--tinta); border-radius: 20px;
+  background: var(--amarillo);
+  box-shadow: 0 4px 0 var(--tinta);
+  font-family: var(--titulo); font-weight: 800; font-size: 20px;
+  cursor: pointer; text-align: center;
+  transition: transform 0.06s, box-shadow 0.06s;
+}
+.boton:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--tinta); }
+.boton.blanco { background: var(--blanco); }
+.boton.crece { flex: 1; }
+.boton[disabled] { background: var(--pista-barra); box-shadow: none; border-style: dashed; cursor: default; font-size: 14px; }
+.enlace {
+  min-height: 44px; padding: 0 16px; border: none; background: none;
+  font-size: 15px; font-weight: 800; text-decoration: underline; cursor: pointer;
+  align-self: center;
+}
+.barra {
+  height: 14px; border: 2px solid var(--tinta); border-radius: 9px;
+  background: var(--pista-barra); overflow: hidden;
+}
+.barra i { display: block; height: 100%; background: var(--amarillo); transition: width 0.4s; }
+.titulo-grande { font-family: var(--titulo); font-weight: 800; font-size: 30px; line-height: 34px; }
+.centro { text-align: center; align-items: center; }
+.columna { display: flex; flex-direction: column; gap: 12px; }
+
+/* Bienvenida */
+.bienvenida { justify-content: center; }
+.bienvenida input {
+  width: 100%; height: 56px; padding: 0 16px;
+  border: 3px solid var(--tinta); border-radius: 18px; background: var(--blanco);
+  font-size: 20px; font-weight: 800; text-align: center;
+  user-select: text; -webkit-user-select: text;
+}
+.bienvenida label { font-size: 16px; font-weight: 800; }
+
+/* Casa */
+.progreso { display: flex; flex-direction: column; gap: 6px; padding: 10px 14px; font-size: 13px; font-weight: 800; }
+.escena {
+  position: relative; flex: 1; min-height: 240px;
+  border: 3px solid var(--tinta); border-radius: 28px;
+  overflow: hidden; background: var(--cielo);
+}
+.escena svg.fondo { position: absolute; inset: 0; width: 100%; height: 100%; }
+.bocadillo {
+  position: absolute; right: 10px; top: 10px; max-width: 62%;
+  padding: 8px 12px;
+  border: 3px solid var(--tinta); border-radius: 18px; background: var(--blanco);
+  font-size: 15px; font-weight: 800; line-height: 20px; text-align: center;
+}
+.koala-g { transform-box: fill-box; transform-origin: 50% 100%; cursor: pointer; animation: respira 3s ease-in-out infinite; }
+.koala-g.bote { animation: bote 0.5s ease-out; }
+@keyframes respira { 0%, 100% { transform: scale(1, 1); } 50% { transform: scale(1.015, 0.985); } }
+@keyframes bote { 0% { transform: translateY(0); } 40% { transform: translateY(-9%) scale(0.97, 1.04); } 100% { transform: translateY(0); } }
+
+.necesidades { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.necesidad {
+  display: flex; align-items: center; gap: 10px;
+  min-height: 62px; padding: 8px 10px;
+  border: 3px solid var(--tinta); border-radius: 18px; background: var(--blanco);
+  text-align: left; cursor: pointer;
+}
+.necesidad:active { transform: translateY(2px); }
+.necesidad .datos { display: flex; flex-direction: column; gap: 5px; flex: 1; font-size: 14px; font-weight: 800; }
+.necesidad .barra { height: 10px; border-radius: 7px; }
+.necesidad svg { flex-shrink: 0; }
+
+.velo {
+  position: fixed; inset: 0; z-index: 10;
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+  background: rgba(59, 42, 32, 0.55);
+}
+.velo .tarjeta { width: 100%; max-width: 360px; padding: 22px 18px; }
+
+/* Menú de juegos */
+.seccion { display: flex; flex-direction: column; gap: 8px; }
+.seccion h2 { font-family: var(--titulo); font-weight: 800; font-size: 18px; line-height: 22px; }
+.juego {
+  display: flex; align-items: center; gap: 12px;
+  min-height: 66px; padding: 8px 12px 8px 8px;
+  border: 3px solid var(--tinta); border-radius: 18px; background: var(--blanco);
+  box-shadow: 0 4px 0 var(--tinta);
+}
+.juego:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--tinta); }
+.juego .ficha {
+  display: flex; align-items: center; justify-content: center;
+  width: 46px; height: 46px; flex-shrink: 0;
+  border: 2px solid var(--tinta); border-radius: 14px;
+  font-family: var(--titulo); font-weight: 800; font-size: 28px; line-height: 28px;
+}
+.juego .datos { display: flex; flex-direction: column; flex: 1; }
+.juego .datos b { font-size: 16px; font-weight: 800; line-height: 20px; }
+.juego .datos span { font-size: 13px; line-height: 17px; }
+
+/* Reto de mates */
+.puntos { display: flex; gap: 8px; }
+.puntos span { display: block; width: 26px; height: 14px; border: 2px solid var(--tinta); border-radius: 9px; background: var(--blanco); }
+.puntos span.hecho { background: var(--verde-oscuro); }
+.puntos span.ahora { background: var(--amarillo); }
+.pregunta { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 16px; text-align: center; border-radius: 24px; }
+.pregunta p { font-size: 16px; font-weight: 800; line-height: 22px; }
+.pregunta .grande { font-family: var(--titulo); font-weight: 800; font-size: 54px; line-height: 64px; }
+.pregunta .grande.largo { font-size: 36px; line-height: 48px; }
+.opciones { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.opcion {
+  display: flex; align-items: center; justify-content: center; gap: 10px;
+  height: 80px;
+  border: 3px solid var(--tinta); border-radius: 22px; background: var(--blanco);
+  box-shadow: 0 4px 0 var(--tinta);
+  font-family: var(--titulo); font-weight: 800; font-size: 34px; cursor: pointer;
+}
+.opcion:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--tinta); }
+.opcion.ok { background: var(--verde-claro); }
+.opcion.mal { background: var(--coral-claro); }
+.respuesta { display: flex; flex-direction: column; justify-content: center; gap: 10px; min-height: 112px; }
+.respuesta .pista { background: var(--pista); font-size: 15px; font-weight: 800; line-height: 21px; border-radius: 18px; }
+.respuesta .premio { font-family: var(--titulo); font-weight: 800; font-size: 22px; line-height: 26px; }
+.pie-koala { display: flex; align-items: flex-end; gap: 10px; margin-top: auto; }
+.pie-koala .bocadillo { position: static; max-width: none; flex: 1; margin-bottom: 40px; text-align: left; }
+
+/* Cruzar el río */
+.rio {
+  position: relative; height: 330px; flex-shrink: 0;
+  border: 3px solid var(--tinta); border-radius: 28px;
+  overflow: hidden; background: #7CC4D9;
+}
+.rio .orilla { position: absolute; top: -3px; bottom: -3px; width: 84px; background: #8CCB8A; border: 3px solid var(--tinta); }
+.rio .orilla.izq { left: -3px; border-radius: 0 26px 26px 0; }
+.rio .orilla.der { right: -3px; border-radius: 26px 0 0 26px; }
+.rio .balsa {
+  position: absolute; top: 222px; width: 128px; height: 30px;
+  border: 3px solid var(--tinta); border-radius: 10px; background: #B5825A;
+  transition: left 0.45s;
+}
+.rio .luma { position: absolute; top: 180px; transition: left 0.45s; }
+.rio .pasajero {
+  position: absolute; width: 64px; height: 72px; padding: 2px 0 0;
+  display: flex; flex-direction: column; align-items: center;
+  border: 3px solid var(--tinta); border-radius: 16px; background: var(--blanco);
+  font-size: 12px; font-weight: 800; cursor: pointer;
+  transition: left 0.45s, top 0.45s;
+}
+.mensaje { display: flex; align-items: center; min-height: 66px; font-size: 15px; font-weight: 800; line-height: 21px; border-radius: 18px; padding: 10px 14px; }
+.mensaje.aviso { background: var(--pista); }
+.mensaje.bien { background: var(--verde-claro); }
+
+/* Koala saltarín */
+.salto { position: relative; height: 100dvh; overflow: hidden; background: var(--cielo); }
+.salto canvas { position: absolute; inset: 0; width: 100%; height: 100%; touch-action: none; }
+.salto .hud {
+  position: absolute; left: 16px; right: 16px; top: calc(16px + env(safe-area-inset-top));
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  pointer-events: none;
+}
+.salto .hud > * { pointer-events: auto; }
+.salto .cartel {
+  position: absolute; left: 20px; right: 20px; top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 12px; text-align: center;
+  padding: 22px 18px; border-radius: 24px;
+}
+.salto .cartel p { font-size: 16px; font-weight: 800; line-height: 23px; }
+
+/* Tienda */
+.probador { display: flex; align-items: center; gap: 14px; padding: 10px 16px; background: var(--cielo); border-radius: 24px; }
+.probador .datos { display: flex; flex-direction: column; gap: 4px; }
+.probador .datos b { font-family: var(--titulo); font-weight: 800; font-size: 20px; line-height: 24px; }
+.probador .datos span { font-size: 14px; line-height: 19px; }
+.articulos { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.articulo { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px; font-size: 14px; font-weight: 800; text-align: center; }
+.articulo .boton { width: 100%; min-height: 44px; border-radius: 14px; font-family: inherit; font-size: 14px; box-shadow: none; padding: 0 6px; }
+.articulo .boton.puesto { background: var(--verde-claro); }
+
+@media (prefers-reduced-motion: reduce) {
+  .koala-g, .koala-g.bote { animation: none; }
+  .barra i, .rio .balsa, .rio .luma, .rio .pasajero { transition: none; }
+}

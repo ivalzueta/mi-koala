@@ -1,0 +1,9 @@
+{
+  "name": "mi-koala",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Juego de mascota virtual con un koala, mates y acertijos",
+  "scripts": {
+    "start": "node servidor.js"
+  }
+}
