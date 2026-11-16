@@ -2,10 +2,10 @@
 (function () {
   var NIVEL_MAX = 4;
   var POR_NIVEL = {
-    1: ['suma', 'resta', 'multi', 'serie'],
-    2: ['suma', 'resta', 'multi', 'division', 'serie', 'cambio'],
-    3: ['suma', 'resta', 'multi', 'division', 'serie', 'cambio', 'doble'],
-    4: ['suma', 'resta', 'multi', 'division', 'serie', 'cambio', 'doble', 'fraccion']
+    1: ['suma', 'resta', 'multi', 'serie', 'hora'],
+    2: ['suma', 'resta', 'multi', 'division', 'serie', 'cambio', 'hora', 'falta'],
+    3: ['suma', 'resta', 'multi', 'division', 'serie', 'cambio', 'doble', 'falta', 'perimetro', 'dospasos', 'medida'],
+    4: ['suma', 'resta', 'multi', 'division', 'serie', 'cambio', 'doble', 'fraccion', 'falta', 'perimetro', 'dospasos', 'medida', 'redondeo']
   };
   var TOPE = [0, 40, 100, 400, 1000];
   var TABLAS = [[], [2, 3, 5, 10], [2, 3, 4, 5, 6, 10], [2, 3, 4, 5, 6, 7, 8, 9], [3, 4, 6, 7, 8, 9]];
@@ -86,6 +86,66 @@
         return { texto: '¿Cuánto es el doble?', grande: 'el doble de ' + x, bien: x * 2, pista: 'El doble es sumar el número consigo mismo: ' + x + ' + ' + x + '.' };
       }
       return { texto: '¿Cuánto es la mitad?', grande: 'la mitad de ' + (x * 2), bien: x, pista: 'Busca el número que sumado consigo mismo da ' + (x * 2) + '.' };
+    },
+    hora: function (n) {
+      var h = al(1, 11), m = (n === 1 ? 15 : 5) * al(1, n === 1 ? 3 : 11);
+      return {
+        texto: 'Son las ' + h + ':' + (m < 10 ? '0' + m : m) + '. ¿Cuántos minutos faltan para las ' + (h + 1) + ' en punto?',
+        grande: h + ':' + (m < 10 ? '0' + m : m), bien: 60 - m, extra: [15, -15],
+        pista: 'Una hora tiene 60 minutos. Cuenta desde ' + m + ' hasta 60.'
+      };
+    },
+    falta: function (n) {
+      var a = K.elige(TABLAS[n]), b = al(2, 10);
+      return {
+        texto: '¿Qué número falta para que la multiplicación sea correcta?',
+        grande: '? × ' + a + ' = ' + (a * b), bien: b,
+        pista: 'Repasa la tabla del ' + a + ' hasta llegar a ' + (a * b) + '.'
+      };
+    },
+    perimetro: function (n) {
+      var a = al(3, n === 3 ? 12 : 25), b = al(2, n === 3 ? 9 : 18);
+      return {
+        texto: 'Un huerto rectangular mide ' + a + ' metros de largo y ' + b + ' de ancho. ¿Cuántos metros de valla hacen falta para rodearlo?',
+        grande: a + ' m × ' + b + ' m', bien: 2 * (a + b), extra: [a, -a, b, -b],
+        pista: 'La valla recorre los cuatro lados: dos largos y dos anchos.'
+      };
+    },
+    dospasos: function (n) {
+      var cuantos = al(2, 5), precio = al(2, n === 3 ? 6 : 9), billete = K.elige(n === 3 ? [20, 50] : [50, 100]);
+      if (cuantos * precio >= billete) billete = 100;
+      return {
+        texto: 'Compras ' + cuantos + ' cuadernos de ' + precio + ' monedas cada uno y pagas con un billete de ' + billete + '. ¿Cuánto te devuelven?',
+        grande: billete + ' − ' + cuantos + ' × ' + precio, bien: billete - cuantos * precio, extra: [precio, -precio],
+        pista: 'Primero calcula cuánto cuestan todos los cuadernos y después réstalo de ' + billete + '.'
+      };
+    },
+    medida: function () {
+      var m = al(1, 9), cm = 5 * al(1, 19);
+      if (Math.random() < 0.5) {
+        return {
+          texto: '¿Cuántos centímetros son ' + m + ' metros y ' + cm + ' centímetros?',
+          grande: m + ' m y ' + cm + ' cm', bien: m * 100 + cm, extra: [100, -100, 50],
+          pista: 'Un metro son 100 centímetros.'
+        };
+      }
+      var kg = al(1, 5), g = 100 * al(1, 9);
+      return {
+        texto: '¿Cuántos gramos son ' + kg + ' kilos y ' + g + ' gramos?',
+        grande: kg + ' kg y ' + g + ' g', bien: kg * 1000 + g, extra: [100, -100, 1000, -1000],
+        pista: 'Un kilo son 1000 gramos.'
+      };
+    },
+    redondeo: function () {
+      var centena = Math.random() < 0.5;
+      var x = centena ? al(110, 980) : al(12, 198);
+      var paso = centena ? 100 : 10;
+      if (x % paso === paso / 2) x += 1;
+      return {
+        texto: 'Redondea ' + x + ' a la ' + (centena ? 'centena' : 'decena') + ' más cercana.',
+        grande: String(x), bien: Math.round(x / paso) * paso, extra: [paso, -paso, 2 * paso, -2 * paso],
+        pista: 'Mira entre qué dos ' + (centena ? 'centenas' : 'decenas') + ' está y de cuál queda más cerca.'
+      };
     },
     fraccion: function () {
       var d = K.elige([2, 3, 4, 5]);

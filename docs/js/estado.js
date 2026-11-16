@@ -38,6 +38,8 @@ window.K = K;
       nivelMates: 1,
       recordSalto: 0,
       rioResuelto: false,
+      mini: {},
+      acertijos: {},
       celebrar: null
     };
   }
@@ -51,6 +53,8 @@ window.K = K;
         var limpio = nuevo();
         base.nec = Object.assign(limpio.nec, guardado.nec || {});
         base.puesto = Object.assign(limpio.puesto, guardado.puesto || {});
+        base.mini = guardado.mini || {};
+        base.acertijos = guardado.acertijos || {};
       }
     } catch (e) { /* partida nueva si el guardado no se puede leer */ }
     return base;

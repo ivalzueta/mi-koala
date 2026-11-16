@@ -25,11 +25,11 @@
   };
 
   function ir() {
-    var ruta = location.hash.replace('#/', '') || 'casa';
-    if (!K.estado.nombre) ruta = 'bienvenida';
+    var partes = (location.hash.replace('#/', '') || 'casa').split('/');
+    if (!K.estado.nombre) partes = ['bienvenida'];
     if (actual && actual.salir) actual.salir();
-    actual = K.pantallas[ruta] || K.pantallas.casa;
-    actual.pintar(app);
+    actual = K.pantallas[partes[0]] || K.pantallas.casa;
+    actual.pintar(app, partes[1]);
     window.scrollTo(0, 0);
   }
 

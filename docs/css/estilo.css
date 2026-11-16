@@ -234,6 +234,47 @@ h1, h2, p { margin: 0; }
 }
 .salto .cartel p { font-size: 16px; font-weight: 800; line-height: 23px; }
 
+/* Fiesta de minijuegos */
+.fiesta { height: 100dvh; }
+.fiesta .lienzo { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.fiesta canvas { border: 3px solid var(--tinta); border-radius: 24px; touch-action: none; background: var(--cielo); }
+.fiesta .cartel {
+  position: absolute; left: 12px; right: 12px; top: 50%; transform: translateY(-50%);
+  display: flex; flex-direction: column; gap: 12px; text-align: center;
+  padding: 22px 18px; border-radius: 24px;
+}
+.fiesta .cartel p, .fiesta .instr { font-size: 15px; font-weight: 800; line-height: 21px; }
+.fiesta .instr { text-align: center; min-height: 42px; }
+.minis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.mini {
+  display: flex; align-items: center; gap: 10px;
+  min-height: 64px; padding: 8px 10px 8px 8px;
+  border: 3px solid var(--tinta); border-radius: 18px; background: var(--blanco);
+}
+.mini:active { transform: translateY(2px); }
+.mini .num {
+  display: flex; align-items: center; justify-content: center;
+  width: 34px; height: 34px; flex-shrink: 0;
+  border: 2px solid var(--tinta); border-radius: 17px; background: var(--amarillo);
+  font-family: var(--titulo); font-weight: 800; font-size: 17px;
+}
+.mini .datos { display: flex; flex-direction: column; min-width: 0; }
+.mini .datos b { font-size: 14px; font-weight: 800; line-height: 18px; }
+.mini .datos span { font-size: 12px; line-height: 16px; }
+
+/* Acertijos */
+.acertijo { font-size: 18px; font-weight: 800; line-height: 26px; padding: 18px 16px; border-radius: 24px; }
+.respuesta-a {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  min-height: 56px; padding: 8px 16px;
+  border: 3px solid var(--tinta); border-radius: 18px; background: var(--blanco);
+  box-shadow: 0 4px 0 var(--tinta);
+  font-size: 16px; font-weight: 800; text-align: left; cursor: pointer;
+}
+.respuesta-a:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--tinta); }
+.respuesta-a.ok { background: var(--verde-claro); }
+.respuesta-a.mal { background: var(--coral-claro); }
+
 /* Tienda */
 .probador { display: flex; align-items: center; gap: 14px; padding: 10px 16px; background: var(--cielo); border-radius: 24px; }
 .probador .datos { display: flex; flex-direction: column; gap: 4px; }
