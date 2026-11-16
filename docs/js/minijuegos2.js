@@ -4,7 +4,7 @@
   function dist(x1, y1, x2, y2) { return Math.hypot(x1 - x2, y1 - y2); }
 
   K.mini({
-    id: 'punteria', nombre: 'Puntería', meta: 10,
+    id: 'punteria', nombre: 'Puntería', meta: 18,
     instr: 'La diana se mueve. Toca para lanzar la bellota cuando pase por encima del koala.',
     init: function (g) { g.s = { tx: 195, tv: 150, n: null }; },
     tap: function (g) { if (!g.s.n) g.s.n = { y: 450 }; },
@@ -48,7 +48,7 @@
       var s = g.s;
       if (s.modo !== 'elige' || y < 430 || y > 525) return;
       var i = x < 135 ? 0 : (x < 255 ? 1 : 2);
-      if (s.ops[i] === s.n) g.suma(1); else g.aviso();
+      if (s.ops[i] === s.n) g.suma(1); else { g.suma(-1); g.aviso(); }
       this.nueva(g);
     },
     update: function (g, dt) { var s = g.s; if (s.modo === 'ver') { s.tm -= dt; if (s.tm <= 0) s.modo = 'elige'; } },
@@ -75,7 +75,7 @@
       var s = g.s, lado = 340 / s.n;
       var c = Math.floor((x - 25) / lado), f = Math.floor((y - 80) / lado);
       if (c < 0 || f < 0 || c >= s.n || f >= s.n) return;
-      if (f * s.n + c === s.idx) { g.suma(1); this.nueva(g); } else g.aviso();
+      if (f * s.n + c === s.idx) { g.suma(1); this.nueva(g); } else { g.suma(-1); g.aviso(); }
     },
     draw: function (g) {
       var s = g.s, lado = 340 / s.n;
@@ -94,7 +94,8 @@
     tap: function (g, x) {
       var s = g.s, c = x < 140 ? 0 : (x < 250 ? 1 : 2), mejor = -1, cerca = 50;
       s.n.forEach(function (n, i) { var d = Math.abs(n.y - 450); if (n.c === c && d < cerca) { cerca = d; mejor = i; } });
-      if (mejor >= 0) { s.n.splice(mejor, 1); g.suma(1); s.golpe = c; s.hasta = g.t + 0.12; }
+      s.golpe = c; s.hasta = g.t + 0.12;
+      if (mejor >= 0) { s.n.splice(mejor, 1); g.suma(1); } else { g.suma(-1); g.aviso(); }
     },
     update: function (g, dt) {
       var s = g.s;
@@ -114,7 +115,7 @@
   });
 
   K.mini({
-    id: 'bano', nombre: 'Baño de burbujas', meta: 18,
+    id: 'bano', nombre: 'Baño de burbujas', meta: 45,
     instr: 'El koala se ha manchado de barro. Frota con el dedo cada mancha hasta que desaparezca.',
     nuevas: function (g) {
       g.s.m = [];
@@ -201,7 +202,7 @@
         s.zw = Math.max(34, 70 - g.puntos * 4);
         s.z = g.r(40, 350 - s.zw);
         s.v = (s.v > 0 ? 1 : -1) * (260 + g.puntos * 22);
-      } else g.aviso();
+      } else { g.suma(-1); g.aviso(); }
     },
     update: function (g, dt) {
       var s = g.s;
@@ -248,7 +249,7 @@
   });
 
   K.mini({
-    id: 'gotas', nombre: 'Esquiva las gotas', meta: 22,
+    id: 'gotas', nombre: 'Esquiva las gotas', meta: 14,
     instr: 'Empieza a llover. Arrastra al koala para que no le caiga ninguna gota.',
     init: function (g) { g.s = { x: 195, d: [], prox: 0.4, acc: 0 }; },
     update: function (g, dt) {

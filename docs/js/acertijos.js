@@ -70,6 +70,9 @@
     cargar();
   }
 
+  // Los acertijos hablan de «Luma»; se cambia por el nombre que le haya puesto la niña.
+  function conNombre(texto) { return texto.replace(/Luma/g, K.estado.nombre); }
+
   function cargar() {
     var a = LISTA[s.ids[s.i]];
     s.ops = K.baraja(a[1].map(function (texto, k) { return { texto: texto, bien: k === a[2] }; }));
@@ -108,14 +111,14 @@
       var a = LISTA[s.ids[s.i]];
       var fallos = Object.keys(s.mal).length > 0;
       h += '<p class="sub" style="font-size:14px;font-weight:800">Acertijo ' + (s.i + 1) + ' de ' + s.ids.length + (s.repaso ? ' · repaso' : '') + '</p>';
-      h += '<div class="tarjeta acertijo">' + K.h(a[0]) + '</div>';
+      h += '<div class="tarjeta acertijo">' + K.h(conNombre(a[0])) + '</div>';
       h += '<div class="columna" style="gap:10px">';
       s.ops.forEach(function (o, k) {
         var ok = s.ok && o.bien, mal = !!s.mal[k];
         h += '<button class="respuesta-a' + (ok ? ' ok' : '') + (mal ? ' mal' : '') + '" data-k="' + k + '"><span>' + K.h(o.texto) + '</span>' + (ok ? K.ico.bien : '') + (mal ? K.ico.mal : '') + '</button>';
       });
       h += '</div><div aria-live="polite" class="columna">';
-      if (s.ok) h += '<div class="tarjeta mensaje bien">' + K.h(a[4]) + ' ' + s.premio + '.</div><button class="boton" data-sig>' + (s.i < s.ids.length - 1 ? 'Siguiente acertijo' : 'Terminar') + '</button>';
+      if (s.ok) h += '<div class="tarjeta mensaje bien">' + K.h(conNombre(a[4])) + ' ' + s.premio + '.</div><button class="boton" data-sig>' + (s.i < s.ids.length - 1 ? 'Siguiente acertijo' : 'Terminar') + '</button>';
       else if (fallos) h += '<div class="tarjeta mensaje aviso">Pista: ' + K.h(a[3]) + '</div>';
       else h += '<p class="sub" style="text-align:center;font-size:14px">Piénsalo con calma. Si aciertas a la primera, ganas una estrella.</p>';
       h += '</div>';

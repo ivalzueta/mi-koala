@@ -105,7 +105,7 @@
     if (fase === 'jugando') {
       g.t += dt;
       if (g.rojo > 0) g.rojo -= dt;
-      def.update(g, dt);
+      if (def.update) def.update(g, dt);
       if (fase === 'jugando' && g.t >= def.dur) terminar();
       raiz.querySelector('[data-puntos]').textContent = g.puntos;
       raiz.querySelector('[data-tiempo]').style.width = Math.max(0, 100 - g.t / def.dur * 100) + '%';

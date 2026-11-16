@@ -35,7 +35,7 @@
   });
 
   K.mini({
-    id: 'mariposas', nombre: 'Caza mariposas', meta: 14,
+    id: 'mariposas', nombre: 'Caza mariposas', meta: 22,
     instr: 'Toca las mariposas antes de que se escapen. Cada vez vuelan más rápido.',
     init: function (g) {
       g.s = { m: [] };
@@ -67,7 +67,7 @@
   });
 
   K.mini({
-    id: 'wombat', nombre: 'Toca al wombat', meta: 14,
+    id: 'wombat', nombre: 'Toca al wombat', meta: 22,
     instr: 'Toca a los wombats que asoman. ¡A los erizos con pinchos no!',
     init: function (g) {
       g.s = { h: [], prox: 0.5 };
@@ -138,7 +138,7 @@
   });
 
   K.mini({
-    id: 'globos', nombre: 'Explota globos', meta: 16,
+    id: 'globos', nombre: 'Explota globos', meta: 28,
     instr: 'Toca los globos para explotarlos. ¡Las castañas con pinchos restan!',
     init: function (g) { g.s = { b: [], prox: 0 }; },
     tap: function (g, x, y) {
@@ -272,7 +272,7 @@
   });
 
   K.mini({
-    id: 'pesca', nombre: 'Día de pesca', meta: 8,
+    id: 'pesca', nombre: 'Día de pesca', meta: 14,
     instr: 'La barca se mueve sola. Toca para soltar el anzuelo justo encima de un pez.',
     init: function (g) {
       g.s = { bx: 195, d: 1, a: null, f: [] };
