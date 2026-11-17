@@ -7,8 +7,51 @@
   K.MINIS = LISTA;
 
   var raiz, canvas, ctx, raf, ultimo, g, def, fase, imgs, teclas = {};
-  var cuenta = 0, antes = 0, chispas = [], ultimoPop = 0;
-  function son(t) { if (K.son) K.son(t); }
+  var cuenta = 0, antes = 0, chispas = [], ultimoPop = 0, combo = 0, mejorCombo = 0, ultimoPunto = -9, copa = null;
+  function son(t, n) { if (K.son) K.son(t, n); }
+
+  // Medallas: bronce con la mitad de la meta, plata con la meta, oro con un 30 % más.
+  function medalla(p, meta) {
+    if (p >= Math.ceil(meta * 1.3)) return 3;
+    if (p >= meta) return 2;
+    if (p >= Math.ceil(meta / 2)) return 1;
+    return 0;
+  }
+  var METAL = [null, { nombre: 'bronce', color: '#D9915A' }, { nombre: 'plata', color: '#D5DEE6' }, { nombre: 'oro', color: '#FFC53D' }];
+  function icoMedalla(n, t) {
+    t = t || 30;
+    if (!n) return '<svg aria-hidden="true" width="' + t + '" height="' + t + '" viewBox="0 0 24 24"><circle cx="12" cy="14" r="7" fill="none" stroke="#C9BBA8" stroke-width="2" stroke-dasharray="3 3"/></svg>';
+    return '<svg role="img" aria-label="Medalla de ' + METAL[n].nombre + '" width="' + t + '" height="' + t + '" viewBox="0 0 24 24">' +
+      '<path d="M7 1h4l2 6H9ZM13 1h4l-2 6h-4Z" fill="#F2664B" stroke="' + T + '" stroke-width="1.5" stroke-linejoin="round"/>' +
+      '<circle cx="12" cy="15" r="7.5" fill="' + METAL[n].color + '" stroke="' + T + '" stroke-width="2"/>' +
+      '<path d="M12 11l1.2 2.500 2.700.3-2 1.900.5 2.700L12 17.100 9.600 18.400l.5-2.700-2-1.900 2.700-.3Z" fill="#FFFFFF" stroke="' + T + '" stroke-width="1" stroke-linejoin="round"/></svg>';
+  }
+
+  // Rivales de la Copa del bosque
+  var RIVALES = [
+    { nombre: 'Wombi', animal: 'wombat', color: '#A9825F', nivel: 0.95 },
+    { nombre: 'Saltarina', animal: 'canguro', color: '#E8A25A', nivel: 1.05 },
+    { nombre: 'Pico', animal: 'ornitorrinco', color: '#6FA9A2', nivel: 0.85 }
+  ];
+  function caraRival(r, t) {
+    t = t || 40;
+    var s = '<svg role="img" aria-label="' + r.nombre + '" width="' + t + '" height="' + t + '" viewBox="0 0 40 40"><g stroke="' + T + '" stroke-width="2.500" stroke-linejoin="round">';
+    if (r.animal === 'canguro') s += '<ellipse cx="11" cy="9" rx="4" ry="9" fill="' + r.color + '"/><ellipse cx="29" cy="9" rx="4" ry="9" fill="' + r.color + '"/>';
+    else s += '<circle cx="9" cy="12" r="5" fill="' + r.color + '"/><circle cx="31" cy="12" r="5" fill="' + r.color + '"/>';
+    s += '<circle cx="20" cy="23" r="14" fill="' + r.color + '"/>';
+    s += '<circle cx="14.500" cy="20" r="2.200" fill="' + T + '" stroke="none"/><circle cx="25.500" cy="20" r="2.200" fill="' + T + '" stroke="none"/>';
+    if (r.animal === 'ornitorrinco') s += '<ellipse cx="20" cy="30" rx="9" ry="5" fill="#4A4A55"/>';
+    else s += '<ellipse cx="20" cy="27" rx="4" ry="3" fill="' + T + '" stroke="none"/><path d="M16 31q4 3 8 0" fill="none"/>';
+    return s + '</g></svg>';
+  }
+  function caraKoala(t) { return K.koalaSVG({ ancho: t || 40, puesto: K.estado.puesto, trazo: 9 }); }
+
+  function nuevaCopa() {
+    return {
+      juegos: K.baraja(LISTA).slice(0, 3), i: 0,
+      total: { yo: 0, r0: 0, r1: 0, r2: 0 }
+    };
+  }
 
   function imagen(svg) {
     var i = new Image();
@@ -102,7 +145,7 @@
     chispas.forEach(function (c) {
       ctx.globalAlpha = Math.max(0, c.vida / 0.8);
       ctx.lineWidth = 5; ctx.strokeStyle = '#FFFFFF';
-      ctx.font = '800 30px "Baloo 2", "Nunito", ui-rounded, sans-serif';
+      ctx.font = '800 ' + (c.tam || 30) + 'px "Baloo 2", "Nunito", ui-rounded, sans-serif';
       ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
       ctx.strokeText(c.txt, c.x, c.y); ctx.fillStyle = c.color; ctx.fillText(c.txt, c.x, c.y);
       ctx.globalAlpha = 1; ctx.lineWidth = 3; ctx.strokeStyle = T;
@@ -135,8 +178,19 @@
       if (g.puntos !== antes) {
         var d = g.puntos - antes;
         chispas.push({ txt: (d > 0 ? '+' : '') + d, x: Math.max(30, Math.min(W - 30, g.px)), y: Math.max(40, g.py - 30), vida: 0.8, color: d > 0 ? '#3E9B5F' : '#D9502F' });
-        if (d > 0 && t - ultimoPop > 70) { son('pop'); ultimoPop = t; }
-        else if (d < 0 && g.rojo <= 0) son('mal');
+        if (d > 0) {
+          combo = g.t - ultimoPunto < 1.3 ? combo + 1 : 1;
+          ultimoPunto = g.t;
+          if (combo > mejorCombo) mejorCombo = combo;
+          if (combo >= 3 && combo % 1 === 0) {
+            chispas = chispas.filter(function (c) { return !c.combo; });
+            chispas.push({ txt: '¡Combo x' + combo + '!', x: W / 2, y: 70, vida: 0.9, color: combo >= 8 ? '#D9502F' : '#E89A00', combo: true, tam: 30 + Math.min(14, combo * 2) });
+          }
+          if (t - ultimoPop > 70) { son('pop', combo); ultimoPop = t; }
+        } else {
+          combo = 0;
+          if (g.rojo <= 0) son('mal');
+        }
         antes = g.puntos;
       }
       if (fase === 'jugando' && g.t >= def.dur) terminar();
@@ -160,7 +214,7 @@
   function empezar() {
     preparar();
     cartel('');
-    chispas = []; antes = 0;
+    chispas = []; antes = 0; combo = 0; mejorCombo = 0; ultimoPunto = -9;
     cuenta = 3; fase = 'cuenta';
     son('bip');
   }
@@ -174,16 +228,94 @@
     if (record) e.mini[def.id] = g.puntos;
     K.sumarHojas(hojas);
     K.subirNecesidad('diversion', 8);
-    var genial = g.puntos >= def.meta;
+    var med = medalla(g.puntos, def.meta);
+    var genial = med >= 2;
+    var textoCombo = mejorCombo >= 3 ? ' Mejor combo: x' + mejorCombo + '.' : '';
+    if (copa) { finCopa(hojas, med); return; }
     if (record || genial) { son('fanfarria'); if (K.confeti) K.confeti(record ? 90 : 50); }
-    cartel(K.koalaSVG({ ancho: 96, salto: record || genial, puesto: K.estado.puesto, trazo: 7, clase: 'salta' }) +
-      '<h2 class="titulo-grande">' + (record ? '¡Nuevo récord!' : genial ? '¡Genial!' : '¡Se acabó!') + '</h2>' +
-      '<p>Has hecho ' + g.puntos + (g.puntos === 1 ? ' punto' : ' puntos') + ' y ganas ' + hojas + (hojas === 1 ? ' hoja' : ' hojas') + '. Tu récord es ' + (e.mini[def.id] || 0) + '.</p>' +
+    cartel('<div class="fila-centro">' + K.koalaSVG({ ancho: 84, salto: record || genial, puesto: K.estado.puesto, trazo: 7, clase: 'salta' }) +
+      '<span class="medalla-grande ' + (med ? 'aparece' : '') + '">' + icoMedalla(med, 64) + '</span></div>' +
+      '<h2 class="titulo-grande">' + (med === 3 ? '¡Medalla de oro!' : record ? '¡Nuevo récord!' : med ? '¡Medalla de ' + METAL[med].nombre + '!' : '¡Se acabó!') + '</h2>' +
+      '<p>Has hecho ' + g.puntos + (g.puntos === 1 ? ' punto' : ' puntos') + ' y ganas ' + hojas + (hojas === 1 ? ' hoja' : ' hojas') + '.' + textoCombo + '</p>' +
+      '<p class="metas">' + metas(def) + '</p>' +
       '<button class="boton" data-otra>Otra vez</button>' +
       '<button class="boton blanco" data-sorpresa>Juego sorpresa</button>' +
       '<a class="enlace" href="#/fiesta">Ver todos los juegos</a>');
     raiz.querySelector('[data-otra]').addEventListener('click', empezar);
     raiz.querySelector('[data-sorpresa]').addEventListener('click', function () { cargar(otro(def.id)); });
+  }
+
+  // Lo que hace falta para cada medalla, marcando las conseguidas.
+  function metas(d) {
+    var r = K.estado.mini[d.id] || 0;
+    return [1, 2, 3].map(function (n) {
+      var falta = n === 3 ? Math.ceil(d.meta * 1.3) : n === 2 ? d.meta : Math.ceil(d.meta / 2);
+      return '<span class="meta' + (r >= falta ? ' hecha' : '') + '">' + icoMedalla(n, 22) + falta + '</span>';
+    }).join('');
+  }
+
+  // Copa del bosque: 3 juegos seguidos contra 3 rivales. Cada juego da 3, 2, 1 o 0 bellotas según el puesto.
+  function puntosRival(r, d) {
+    return Math.max(0, Math.round(d.meta * r.nivel * (0.55 + Math.random() * 0.5)));
+  }
+
+  function filaRival(cara, nombre, pts, extra, yo) {
+    return '<li class="' + (yo ? 'yo' : '') + '">' + cara + '<b>' + nombre + '</b><span>' + pts + '</span>' + (extra || '') + '</li>';
+  }
+
+  function finCopa(hojas, med) {
+    var lista = [{ cara: caraKoala(34), nombre: K.h(K.estado.nombre), pts: g.puntos, clave: 'yo', yo: true }];
+    RIVALES.forEach(function (r, i) { lista.push({ cara: caraRival(r, 34), nombre: r.nombre, pts: puntosRival(r, def), clave: 'r' + i }); });
+    // Gana el koala en caso de empate: es su fiesta.
+    lista.sort(function (a, b) { return b.pts - a.pts || (b.yo ? 1 : 0) - (a.yo ? 1 : 0); });
+    var BELLOTAS = [3, 2, 1, 0];
+    var puesto = 0;
+    lista.forEach(function (x, i) { x.gana = BELLOTAS[i]; copa.total[x.clave] += x.gana; if (x.yo) puesto = i; });
+    if (puesto === 0) { son('fanfarria'); if (K.confeti) K.confeti(50); } else son(puesto === 1 ? 'bien' : 'mal');
+
+    var ultimo = copa.i >= copa.juegos.length - 1;
+    var h = '<h2 class="titulo-grande">' + ['¡Has ganado este juego!', '¡Segundo puesto!', 'Tercer puesto', 'Cuarto puesto... ¡a por el siguiente!'][puesto] + '</h2>';
+    h += '<ol class="ranking">' + lista.map(function (x) {
+      return filaRival(x.cara, x.nombre, x.pts + ' pts', '<em>+' + x.gana + ' ' + icoBellota(18) + '</em>', x.yo);
+    }).join('') + '</ol>';
+    h += '<p>Ganas ' + hojas + (hojas === 1 ? ' hoja' : ' hojas') + '.</p>';
+    h += '<button class="boton" data-sigue>' + (ultimo ? 'Ver el podio' : 'Siguiente juego (' + (copa.i + 2) + ' de 3)') + '</button>';
+    cartel(h);
+    raiz.querySelector('[data-sigue]').addEventListener('click', function () {
+      if (ultimo) podio();
+      else { copa.i++; cargar(copa.juegos[copa.i]); }
+    });
+  }
+
+  function icoBellota(t) {
+    return '<svg role="img" aria-label="bellotas" width="' + t + '" height="' + t + '" viewBox="0 0 24 24"><path d="M6 11c0 6 3 10 6 11 3-1 6-5 6-11Z" fill="#C7894B" stroke="' + T + '" stroke-width="2" stroke-linejoin="round"/><path d="M4 11c0-4 4-6 8-6s8 2 8 6Z" fill="#8A5A33" stroke="' + T + '" stroke-width="2" stroke-linejoin="round"/><path d="M12 5V2" stroke="' + T + '" stroke-width="2" stroke-linecap="round"/></svg>';
+  }
+
+  function podio() {
+    var lista = [{ cara: caraKoala(54), nombre: K.h(K.estado.nombre), b: copa.total.yo, yo: true }];
+    RIVALES.forEach(function (r, i) { lista.push({ cara: caraRival(r, 54), nombre: r.nombre, b: copa.total['r' + i] }); });
+    lista.sort(function (a, b) { return b.b - a.b || (b.yo ? 1 : 0) - (a.yo ? 1 : 0); });
+    var puesto = lista.findIndex(function (x) { return x.yo; });
+    var premio = [15, 8, 4, 2][puesto];
+    K.sumarHojas(premio);
+    if (puesto === 0) {
+      K.estado.copas = (K.estado.copas || 0) + 1;
+      K.guardar();
+      son('fanfarria');
+      if (K.confeti) K.confeti(160);
+    } else son('bien');
+    // Podio: 2.º a la izquierda, 1.º en el centro, 3.º a la derecha.
+    var orden = [lista[1], lista[0], lista[2]], alturas = [70, 100, 50], numeros = [2, 1, 3];
+    var h = '<h2 class="titulo-grande">' + (puesto === 0 ? '¡' + K.h(K.estado.nombre) + ' gana la Copa del bosque!' : ['', '¡Segundo en la Copa!', '¡Tercero en la Copa!', 'Esta vez no ha habido suerte'][puesto]) + '</h2>';
+    h += '<div class="podio">' + orden.map(function (x, i) {
+      return '<div class="peana' + (x.yo ? ' yo' : '') + '"><div class="' + (numeros[i] === 1 ? 'salta' : '') + '">' + x.cara + '</div><b>' + x.nombre + '</b>' +
+        '<div class="bloque" style="height:' + alturas[i] + 'px"><span>' + numeros[i] + '</span><small>' + x.b + ' ' + icoBellota(14) + '</small></div></div>';
+    }).join('') + '</div>';
+    if (puesto === 3) h += '<p>' + lista[3].nombre + ' ha quedado cuarto con ' + lista[3].b + ' bellotas.</p>';
+    h += '<p>Premio: ' + premio + ' hojas.' + (K.estado.copas ? ' Copas ganadas: ' + K.estado.copas + '.' : '') + '</p>';
+    h += '<button class="boton" data-otra-copa>Otra copa</button><a class="enlace" href="#/fiesta">Ver todos los juegos</a>';
+    cartel(h);
+    raiz.querySelector('[data-otra-copa]').addEventListener('click', function () { copa = nuevaCopa(); cargar(copa.juegos[0]); });
   }
 
   function otro(menosEste) {
@@ -200,7 +332,15 @@
     preparar();
     raiz.querySelector('[data-puntos]').textContent = '0';
     raiz.querySelector('[data-tiempo]').style.width = '100%';
-    cartel('<h2 class="titulo-grande">' + def.nombre + '</h2><p>' + def.instr + '</p><button class="boton" data-empezar>¡Empezar!</button>');
+    var intro = '<h2 class="titulo-grande">' + def.nombre + '</h2><p>' + def.instr + '</p>';
+    if (copa) {
+      intro = '<p class="copa-etiqueta">' + icoBellota(20) + ' Copa del bosque · Juego ' + (copa.i + 1) + ' de 3</p>' + intro +
+        '<ol class="ranking">' + filaRival(caraKoala(30), K.h(K.estado.nombre), copa.total.yo + ' ' + icoBellota(16), '', true) +
+        RIVALES.map(function (r, i) { return filaRival(caraRival(r, 30), r.nombre, copa.total['r' + i] + ' ' + icoBellota(16)); }).join('') + '</ol>';
+    } else {
+      intro += '<p class="metas">' + metas(def) + '</p>';
+    }
+    cartel(intro + '<button class="boton" data-empezar>¡Empezar!</button>');
     raiz.querySelector('[data-empezar]').addEventListener('click', empezar);
   }
 
@@ -234,7 +374,8 @@
     };
     teclas = {};
     medir();
-    var d = LISTA.filter(function (x) { return x.id === id; })[0] || K.elige(LISTA);
+    copa = id === 'copa' ? nuevaCopa() : null;
+    var d = copa ? copa.juegos[0] : LISTA.filter(function (x) { return x.id === id; })[0] || K.elige(LISTA);
     cargar(d);
 
     canvas.addEventListener('pointerdown', function (e) {
@@ -255,11 +396,17 @@
 
   function menu(app) {
     var h = '<section class="pantalla">' + K.cabecera('Fiesta de juegos', 'juegos');
-    h += '<a class="boton" href="#/fiesta/sorpresa">Juego sorpresa</a>';
+    var oros = 0;
+    LISTA.forEach(function (d) { if (medalla(K.estado.mini[d.id] || 0, d.meta) === 3) oros++; });
+    h += '<a class="copa-boton" href="#/fiesta/copa">' +
+      '<span class="caras">' + caraKoala(40) + RIVALES.map(function (r) { return caraRival(r, 36); }).join('') + '</span>' +
+      '<span class="datos"><b>Copa del bosque</b><span>3 juegos contra Wombi, Saltarina y Pico' + (K.estado.copas ? ' · Copas: ' + K.estado.copas : '') + '</span></span></a>';
+    h += '<div class="fila"><a class="boton" href="#/fiesta/sorpresa" style="flex:1">Juego sorpresa</a>' +
+      '<div class="pastilla">' + icoMedalla(3, 22) + oros + ' / ' + LISTA.length + '</div></div>';
     h += '<div class="minis">';
-    LISTA.forEach(function (d, i) {
+    LISTA.forEach(function (d) {
       var r = K.estado.mini[d.id];
-      h += '<a class="mini" href="#/fiesta/' + d.id + '"><span class="num" aria-hidden="true">' + (i + 1) + '</span>' +
+      h += '<a class="mini" href="#/fiesta/' + d.id + '"><span class="med">' + icoMedalla(medalla(r || 0, d.meta), 34) + '</span>' +
         '<span class="datos"><b>' + d.nombre + '</b><span>' + (r ? 'Récord: ' + r : 'Sin jugar') + '</span></span></a>';
     });
     h += '</div></section>';

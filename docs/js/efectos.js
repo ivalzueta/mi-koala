@@ -29,7 +29,7 @@
 
   var SONIDOS = {
     toque: function () { nota(660, 520, 0.07, 'triangle', 0.08); },
-    pop: function () { nota(500, 900, 0.09, 'sine', 0.16); },
+    pop: function (n) { var k = 1 + Math.min(12, (n || 1) - 1) * 0.07; nota(500 * k, 900 * k, 0.09, 'sine', 0.16); },
     hoja: function () { nota(880, 880, 0.08, 'square', 0.05); nota(1320, 1320, 0.14, 'square', 0.05, 0.07); },
     bien: function () { [523, 659, 784].forEach(function (f, i) { nota(f, f, 0.16, 'triangle', 0.16, i * 0.08); }); },
     mal: function () { nota(220, 150, 0.25, 'sawtooth', 0.07); },
@@ -46,7 +46,7 @@
     regalo: function () { for (var i = 0; i < 8; i++) nota(500 + i * 90, 500 + i * 90, 0.08, 'triangle', 0.12, i * 0.05); }
   };
 
-  K.son = function (tipo) { try { if (SONIDOS[tipo]) SONIDOS[tipo](); } catch (e) { /* sin sonido */ } };
+  K.son = function (tipo, n) { try { if (SONIDOS[tipo]) SONIDOS[tipo](n); } catch (e) { /* sin sonido */ } };
 
   // Confeti por toda la pantalla
   var COLORES = ['#FFC53D', '#5DB075', '#F2664B', '#7CC4D9', '#F7A8B8', '#B9C6F2'];
