@@ -81,7 +81,8 @@
 
   function elegir(k) {
     if (s.ok) return;
-    if (!s.ops[k].bien) { s.mal[k] = true; dibujar(); return; }
+    if (!s.ops[k].bien) { s.mal[k] = true; K.son('mal'); dibujar(); return; }
+    K.son('bien');
     var id = s.ids[s.i];
     var limpio = Object.keys(s.mal).length === 0;
     s.ok = true;

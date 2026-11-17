@@ -285,7 +285,71 @@ h1, h2, p { margin: 0; }
 .articulo .boton { width: 100%; min-height: 44px; border-radius: 14px; font-family: inherit; font-size: 14px; box-shadow: none; padding: 0 6px; }
 .articulo .boton.puesto { background: var(--verde-claro); }
 
+/* Vida y efectos */
+.ojos { transform-box: fill-box; transform-origin: 50% 50%; animation: parpadeo 4.2s infinite; }
+@keyframes parpadeo { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
+.oreja { transform-box: fill-box; transform-origin: 50% 90%; }
+.koala-g .oi { animation: orejaI 5s ease-in-out infinite; }
+.koala-g .od { animation: orejaD 5s ease-in-out infinite 0.4s; }
+@keyframes orejaI { 0%, 85%, 100% { transform: rotate(0); } 90% { transform: rotate(-10deg); } 95% { transform: rotate(4deg); } }
+@keyframes orejaD { 0%, 85%, 100% { transform: rotate(0); } 90% { transform: rotate(10deg); } 95% { transform: rotate(-4deg); } }
+.koala-g.gira { animation: gira 0.9s ease-in-out; }
+@keyframes gira { 0% { transform: rotate(0); } 50% { transform: translateY(-14%) rotate(180deg) scale(1.05); } 100% { transform: rotate(360deg); } }
+.koala-g.tiembla { animation: tiembla 0.4s; }
+@keyframes tiembla { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4%); } 75% { transform: translateX(4%); } }
+.salta { animation: salta 0.6s ease-out; }
+@keyframes salta { 0%, 100% { transform: translateY(0); } 40% { transform: translateY(-18px) scale(1.05); } }
+.niega { animation: tiembla 0.4s; }
+.nube { animation: nube 26s linear infinite; }
+.nube.lenta { animation-duration: 40s; animation-delay: -12s; }
+@keyframes nube { 0% { transform: translateX(-200px); } 100% { transform: translateX(420px); } }
+.sol { transform-box: fill-box; transform-origin: center; animation: sol 4s ease-in-out infinite; }
+@keyframes sol { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+.rama { transform-box: fill-box; transform-origin: 100% 0; animation: rama 6s ease-in-out infinite; }
+@keyframes rama { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(3deg); } }
+.mariposa { animation: vuela 14s ease-in-out infinite; }
+@keyframes vuela {
+  0% { transform: translate(20px, 250px); } 25% { transform: translate(140px, 170px); }
+  50% { transform: translate(230px, 230px); } 75% { transform: translate(110px, 300px); } 100% { transform: translate(20px, 250px); }
+}
+.alas { transform-box: fill-box; transform-origin: 50% 50%; animation: aletea 0.25s ease-in-out infinite alternate; }
+@keyframes aletea { from { transform: scaleX(1); } to { transform: scaleX(0.3); } }
+.bocadillo.nuevo { animation: aparece 0.35s ease-out; }
+.aparece { animation: aparece 0.45s cubic-bezier(.3,1.6,.6,1); }
+@keyframes aparece { 0% { transform: scale(0.6); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+.pastilla.late { animation: late 0.45s ease-out; }
+@keyframes late { 0%, 100% { transform: scale(1); } 40% { transform: scale(1.25); } }
+
+.regalo-dia {
+  position: absolute; left: 10px; bottom: 10px; z-index: 2;
+  display: flex; flex-direction: column; align-items: center; gap: 0;
+  padding: 6px 8px; border: 3px solid var(--tinta); border-radius: 16px; background: var(--blanco);
+  font-size: 13px; font-weight: 800; cursor: pointer;
+  animation: regalo 1.4s ease-in-out infinite;
+}
+.regalo-dia.abierto { animation: abrir 0.6s ease-in forwards; }
+@keyframes regalo { 0%, 70%, 100% { transform: rotate(0); } 78% { transform: rotate(-12deg) scale(1.08); } 86% { transform: rotate(12deg) scale(1.08); } 94% { transform: rotate(-6deg); } }
+@keyframes abrir { 0% { transform: scale(1); } 50% { transform: scale(1.4) rotate(10deg); } 100% { transform: scale(0); opacity: 0; } }
+
+.confeti { position: fixed; inset: 0; z-index: 50; pointer-events: none; overflow: hidden; }
+.confeti i { position: absolute; top: -20px; width: 10px; height: 14px; border: 2px solid var(--tinta); border-radius: 2px; animation: cae linear forwards; }
+@keyframes cae { to { transform: translate(var(--lado), 110vh) rotate(var(--giro)); } }
+.flota {
+  position: fixed; z-index: 40; pointer-events: none;
+  display: flex; align-items: center; gap: 4px;
+  font-family: var(--titulo); font-size: 26px; font-weight: 800; color: var(--tinta);
+  transform: translate(-50%, -50%);
+  animation: flota 1.3s ease-out forwards;
+}
+.flota.premio { font-size: 20px; color: #1F6B3A; }
+.flota .zeta { font-size: 30px; color: #6A7BC4; -webkit-text-stroke: 1px var(--tinta); }
+@keyframes flota {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  15% { opacity: 1; transform: translate(-50%, -80%) scale(1.1); }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--lado)), -260%) scale(1); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .koala-g, .koala-g.bote { animation: none; }
+  .koala-g, .koala-g.bote, .koala-g.gira, .ojos, .oreja, .nube, .sol, .rama, .mariposa, .alas, .regalo-dia, .salta, .flota { animation: none !important; }
   .barra i, .rio .balsa, .rio .luma, .rio .pasajero { transition: none; }
 }

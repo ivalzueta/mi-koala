@@ -7,6 +7,8 @@
   K.MINIS = LISTA;
 
   var raiz, canvas, ctx, raf, ultimo, g, def, fase, imgs, teclas = {};
+  var cuenta = 0, antes = 0, chispas = [], ultimoPop = 0;
+  function son(t) { if (K.son) K.son(t); }
 
   function imagen(svg) {
     var i = new Image();
@@ -25,7 +27,7 @@
     var o = { W: W, H: H, T: T, t: 0, puntos: 0, px: W / 2, py: H / 2, abajo: false, rojo: 0, s: {}, al: K.al, elige: K.elige, baraja: K.baraja };
     o.r = function (a, b) { return a + Math.random() * (b - a); };
     o.suma = function (n) { o.puntos = Math.max(0, o.puntos + n); };
-    o.aviso = function () { o.rojo = 0.25; };
+    o.aviso = function () { if (o.rojo <= 0) son('mal'); o.rojo = 0.25; };
     o.acabar = function () { terminar(); };
     o.dir = function () {
       if (teclas.ArrowLeft) return -1;
@@ -96,16 +98,47 @@
     ctx.lineWidth = 3; ctx.strokeStyle = T; ctx.lineJoin = 'round'; ctx.lineCap = 'round';
     def.draw(g);
     if (g.rojo > 0) { ctx.fillStyle = 'rgba(217,80,47,0.28)'; ctx.fillRect(0, 0, W, H); }
+    // Números que saltan al ganar puntos
+    chispas.forEach(function (c) {
+      ctx.globalAlpha = Math.max(0, c.vida / 0.8);
+      ctx.lineWidth = 5; ctx.strokeStyle = '#FFFFFF';
+      ctx.font = '800 30px "Baloo 2", "Nunito", ui-rounded, sans-serif';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.strokeText(c.txt, c.x, c.y); ctx.fillStyle = c.color; ctx.fillText(c.txt, c.x, c.y);
+      ctx.globalAlpha = 1; ctx.lineWidth = 3; ctx.strokeStyle = T;
+    });
+    // Cuenta atrás 3, 2, 1, ¡Ya!
+    if (fase === 'cuenta') {
+      ctx.fillStyle = 'rgba(255,247,227,0.55)'; ctx.fillRect(0, 0, W, H);
+      var n = Math.ceil(cuenta), f = cuenta - Math.floor(cuenta);
+      var r = 64 + 30 * f;
+      g.circ(W / 2, H / 2, r, '#FFC53D');
+      g.txt(n > 0 ? String(n) : '¡Ya!', W / 2, H / 2 + 4, n > 0 ? 80 + 30 * f : 52);
+    }
   }
 
   function bucle(t) {
     raf = requestAnimationFrame(bucle);
     var dt = Math.min(0.033, (t - ultimo) / 1000 || 0);
     ultimo = t;
+    chispas = chispas.filter(function (c) { c.vida -= dt; c.y -= 70 * dt; return c.vida > 0; });
+    if (fase === 'cuenta') {
+      var antesN = Math.ceil(cuenta);
+      cuenta -= dt;
+      if (Math.ceil(cuenta) < antesN && cuenta > 0) son('bip');
+      if (cuenta <= 0) { fase = 'jugando'; son('ya'); }
+    }
     if (fase === 'jugando') {
       g.t += dt;
       if (g.rojo > 0) g.rojo -= dt;
       if (def.update) def.update(g, dt);
+      if (g.puntos !== antes) {
+        var d = g.puntos - antes;
+        chispas.push({ txt: (d > 0 ? '+' : '') + d, x: Math.max(30, Math.min(W - 30, g.px)), y: Math.max(40, g.py - 30), vida: 0.8, color: d > 0 ? '#3E9B5F' : '#D9502F' });
+        if (d > 0 && t - ultimoPop > 70) { son('pop'); ultimoPop = t; }
+        else if (d < 0 && g.rojo <= 0) son('mal');
+        antes = g.puntos;
+      }
       if (fase === 'jugando' && g.t >= def.dur) terminar();
       raiz.querySelector('[data-puntos]').textContent = g.puntos;
       raiz.querySelector('[data-tiempo]').style.width = Math.max(0, 100 - g.t / def.dur * 100) + '%';
@@ -127,7 +160,9 @@
   function empezar() {
     preparar();
     cartel('');
-    fase = 'jugando';
+    chispas = []; antes = 0;
+    cuenta = 3; fase = 'cuenta';
+    son('bip');
   }
 
   function terminar() {
@@ -139,7 +174,10 @@
     if (record) e.mini[def.id] = g.puntos;
     K.sumarHojas(hojas);
     K.subirNecesidad('diversion', 8);
-    cartel('<h2 class="titulo-grande">' + (record ? '¡Nuevo récord!' : '¡Se acabó!') + '</h2>' +
+    var genial = g.puntos >= def.meta;
+    if (record || genial) { son('fanfarria'); if (K.confeti) K.confeti(record ? 90 : 50); }
+    cartel(K.koalaSVG({ ancho: 96, salto: record || genial, puesto: K.estado.puesto, trazo: 7, clase: 'salta' }) +
+      '<h2 class="titulo-grande">' + (record ? '¡Nuevo récord!' : genial ? '¡Genial!' : '¡Se acabó!') + '</h2>' +
       '<p>Has hecho ' + g.puntos + (g.puntos === 1 ? ' punto' : ' puntos') + ' y ganas ' + hojas + (hojas === 1 ? ' hoja' : ' hojas') + '. Tu récord es ' + (e.mini[def.id] || 0) + '.</p>' +
       '<button class="boton" data-otra>Otra vez</button>' +
       '<button class="boton blanco" data-sorpresa>Juego sorpresa</button>' +

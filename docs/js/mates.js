@@ -198,8 +198,10 @@
       s.hojas += s.ganado;
       if (fallos) s.conFallo++;
       K.sumarHojas(s.ganado);
+      K.son('bien');
     } else {
       s.mal[n] = true;
+      K.son('mal');
     }
     dibujar();
   }
@@ -263,7 +265,7 @@
         '<button class="boton blanco" style="width:100%" data-otra>Jugar otra vez</button></div>';
     }
 
-    h += '<div class="pie-koala">' + K.koalaSVG({ ancho: 124, animo: fallos && !s.ok ? 'normal' : 'feliz', puesto: K.estado.puesto, trazo: 6 }) + '<div class="bocadillo">' + bocadillo + '</div></div>';
+    h += '<div class="pie-koala">' + K.koalaSVG({ ancho: 124, animo: fallos && !s.ok ? 'normal' : 'feliz', salto: s.ok || s.fin, puesto: K.estado.puesto, trazo: 6, clase: s.ok || s.fin ? 'salta' : (fallos ? 'niega' : '') }) + '<div class="bocadillo">' + bocadillo + '</div></div>';
     h += '</section>';
     raiz.innerHTML = h;
 

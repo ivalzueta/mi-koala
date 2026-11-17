@@ -3,7 +3,7 @@
 const CACHE = 'mi-koala';
 const ARCHIVOS = [
   './', 'index.html', 'manifest.webmanifest', 'css/estilo.css',
-  'js/estado.js', 'js/koala.js', 'js/casa.js', 'js/juegos.js', 'js/mates.js',
+  'js/estado.js', 'js/koala.js', 'js/efectos.js', 'js/casa.js', 'js/juegos.js', 'js/mates.js',
   'js/rio.js', 'js/salto.js', 'js/tienda.js', 'js/app.js',
   'js/fiesta.js', 'js/minijuegos1.js', 'js/minijuegos2.js', 'js/acertijos.js',
   'iconos/icono-192.png', 'iconos/icono-512.png'

@@ -16,6 +16,13 @@
     pelota: '<svg aria-hidden="true" width="34" height="34" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#F2664B" stroke="' + T + '" stroke-width="2"/><path d="M4.5 8.5c5 2 10 2 15 0M4.5 15.5c5-2 10-2 15 0" fill="none" stroke="' + T + '" stroke-width="2" stroke-linecap="round"/></svg>',
     gota: '<svg aria-hidden="true" width="34" height="34" viewBox="0 0 24 24"><path d="M12 3c4 5 6.5 8 6.5 11.500a6.500 6.500 0 0 1-13 0C5.500 11 8 8 12 3Z" fill="#7CC4D9" stroke="' + T + '" stroke-width="2" stroke-linejoin="round"/></svg>',
     bien: '<svg role="img" aria-label="Correcto" width="28" height="28" viewBox="0 0 24 24"><path d="M4 12.500 10 18 20 6" fill="none" stroke="#1F6B3A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    corazon: '<svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24"><path d="M12 20.5S3 15 3 9a4.500 4.500 0 0 1 9-1.500A4.500 4.500 0 0 1 21 9c0 6-9 11.500-9 11.500Z" fill="#F2664B" stroke="' + T + '" stroke-width="2" stroke-linejoin="round"/></svg>',
+    burbuja: '<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="#DFF3F9" stroke="' + T + '" stroke-width="2"/><circle cx="9" cy="9" r="2.500" fill="#FFFFFF"/></svg>',
+    regalo: '<svg aria-hidden="true" width="40" height="40" viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="12" rx="2" fill="#F2664B" stroke="' + T + '" stroke-width="2"/><rect x="2" y="6" width="20" height="4" rx="1.500" fill="#FFC53D" stroke="' + T + '" stroke-width="2"/><path d="M12 6v15M12 6C10 2 6 3 8 6M12 6c2-4 6-3 4 0" fill="none" stroke="' + T + '" stroke-width="2" stroke-linecap="round"/></svg>',
+    altavoz: function (on) {
+      return '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4Z" fill="#FFC53D" stroke="' + T + '" stroke-width="2" stroke-linejoin="round"/>' +
+        (on ? '<path d="M16 9c1.500 1.500 1.500 4.500 0 6M18.500 6.500c3 3 3 8 0 11" fill="none" stroke="' + T + '" stroke-width="2" stroke-linecap="round"/>' : '<path d="M16 9l5 6M21 9l-5 6" stroke="' + T + '" stroke-width="2" stroke-linecap="round"/>') + '</svg>';
+    },
     mal: '<svg role="img" aria-label="No es esta" width="26" height="26" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="#A8321A" stroke-width="4" stroke-linecap="round"/></svg>'
   };
 
@@ -29,8 +36,8 @@
     var animo = o.animo || 'feliz';
     var s = '<g stroke="' + T + '" stroke-width="' + (o.trazo || 5) + '" stroke-linejoin="round" stroke-linecap="round">';
 
-    s += '<circle cx="58" cy="66" r="40" fill="#9FB0BF"/><circle cx="182" cy="66" r="40" fill="#9FB0BF"/>';
-    s += '<circle cx="58" cy="68" r="22" fill="#F6D5C9" stroke="none"/><circle cx="182" cy="68" r="22" fill="#F6D5C9" stroke="none"/>';
+    s += '<g class="oreja oi"><circle cx="58" cy="66" r="40" fill="#9FB0BF"/><circle cx="58" cy="68" r="22" fill="#F6D5C9" stroke="none"/></g>';
+    s += '<g class="oreja od"><circle cx="182" cy="66" r="40" fill="#9FB0BF"/><circle cx="182" cy="68" r="22" fill="#F6D5C9" stroke="none"/></g>';
 
     if (o.salto) {
       s += '<ellipse cx="44" cy="150" rx="15" ry="30" fill="#9FB0BF" transform="rotate(-38 44 150)"/>';
@@ -59,13 +66,20 @@
     if (animo === 'triste') {
       s += '<path d="M80 86l20 6M160 86l-20 6" fill="none"/>';
     }
-    s += '<circle cx="90" cy="96" r="11" fill="' + T + '" stroke="none"/><circle cx="150" cy="96" r="11" fill="' + T + '" stroke="none"/>';
-    s += '<circle cx="94" cy="92" r="4" fill="#FFFFFF" stroke="none"/><circle cx="154" cy="92" r="4" fill="#FFFFFF" stroke="none"/>';
+    if (o.dormido) {
+      s += '<path d="M79 98Q90 106 101 98M139 98Q150 106 161 98" fill="none"/>';
+    } else {
+      s += '<g class="ojos">';
+      s += '<circle cx="90" cy="96" r="11" fill="' + T + '" stroke="none"/><circle cx="150" cy="96" r="11" fill="' + T + '" stroke="none"/>';
+      s += '<circle cx="94" cy="92" r="4" fill="#FFFFFF" stroke="none"/><circle cx="154" cy="92" r="4" fill="#FFFFFF" stroke="none"/>';
+      s += '</g>';
+    }
     s += '<ellipse cx="120" cy="112" rx="15" ry="20" fill="' + T + '" stroke="none"/>';
     s += '<ellipse cx="115" cy="102" rx="4" ry="6" fill="#6B5547" stroke="none"/>';
     s += '<ellipse cx="70" cy="124" rx="11" ry="7" fill="#F29C9C" stroke="none"/><ellipse cx="170" cy="124" rx="11" ry="7" fill="#F29C9C" stroke="none"/>';
 
-    if (o.salto) s += '<path d="M104 136Q120 160 136 136Z" fill="#7A2E2E"/>';
+    if (o.dormido) s += '<ellipse cx="120" cy="144" rx="6" ry="7" fill="#7A2E2E"/>';
+    else if (o.salto || o.risa) s += '<path d="M104 136Q120 160 136 136Z" fill="#7A2E2E"/>';
     else if (animo === 'triste') s += '<path d="M107 148Q120 138 133 148" fill="none"/>';
     else if (animo === 'normal') s += '<path d="M109 142Q120 147 131 142" fill="none"/>';
     else s += '<path d="M106 139Q120 152 134 139" fill="none"/>';
